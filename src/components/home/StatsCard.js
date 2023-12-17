@@ -51,10 +51,13 @@ const StatsCard = ({ cols }) => {
     const getData = async () => {
       try {
         const response = await landingReport();
+        console.log(response);
         const totalData = data.map((obj, index) => {
           let key = Object.keys(response)[index];
+          console.log(key);
           return { ...obj, count: response[key] };
         });
+        console.log(totalData);
         setLandingData(totalData);
       } catch (error) {
         console.log("Error fetching data:", error);

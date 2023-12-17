@@ -8,7 +8,7 @@ import Sidebar from "./Sidebar";
 import { columns } from "./columns";
 
 // ** Store & Actions
-import { getAllData, getData } from "../store";
+// import { getAllData, getData } from "../store";
 import { useDispatch, useSelector } from "react-redux";
 
 // ** Third Party Components
@@ -48,44 +48,46 @@ import {
 // ** Styles
 import "@styles/react/libs/react-select/_react-select.scss";
 import "@styles/react/libs/tables/react-dataTable-component.scss";
+import { getUsersList } from "../../core/services/api/get/user/get-user-lists.api";
 
 // ** Table Header
 const CustomHeader = ({
-  store,
+  // store,
   toggleSidebar,
   handlePerPage,
   rowsPerPage,
   handleFilter,
   searchTerm,
 }) => {
-  // ** Converts table to CSV
-  function convertArrayOfObjectsToCSV(array) {
-    let result;
+  //   // ** Converts table to CSV
+  //   function convertArrayOfObjectsToCSV(array) {
+  //     let result;
 
-    const columnDelimiter = ",";
-    const lineDelimiter = "\n";
-    const keys = Object.keys(store.data[0]);
+  //     const columnDelimiter = ",";
+  //     const lineDelimiter = "\n";
+  //     const keys = Object.keys(store.data[0]);
 
-    result = "";
-    result += keys.join(columnDelimiter);
-    result += lineDelimiter;
+  //     result = "";
+  //     result += keys.join(columnDelimiter);
+  //     result += lineDelimiter;
 
-    array.forEach((item) => {
-      let ctr = 0;
-      keys.forEach((key) => {
-        if (ctr > 0) result += columnDelimiter;
+  // array.forEach((item) => {
+  //   let ctr = 0;
+  //   keys.forEach((key) => {
+  //     if (ctr > 0) result += columnDelimiter;
 
-        result += item[key];
+  //     result += item[key];
 
-        ctr++;
-      });
-      result += lineDelimiter;
-    });
+  //     ctr++;
+  //   });
+  //   result += lineDelimiter;
+  // });
 
-    return result;
-  }
+  // return result;
+  // }
 
   // ** Downloads CSV
+
   function downloadCSV(array) {
     const link = document.createElement("a");
     let csv = convertArrayOfObjectsToCSV(array);
@@ -135,7 +137,7 @@ const CustomHeader = ({
               className="ms-50 w-100"
               type="text"
               value={searchTerm}
-              onChange={(e) => handleFilter(e.target.value)}
+              // onChange={(e) => handleFilter(e.target.value)}
             />
           </div>
 
@@ -152,7 +154,7 @@ const CustomHeader = ({
                 </DropdownItem>
                 <DropdownItem
                   className="w-100"
-                  onClick={() => downloadCSV(store.data)}
+                  // onClick={() => downloadCSV(store.data)}
                 >
                   <FileText className="font-small-4 me-50" />
                   <span className="align-middle">CSV</span>
@@ -187,6 +189,16 @@ const CustomHeader = ({
 };
 
 const UsersList = () => {
+  const [listUsers, setListUsers] = useState();
+  const userData = async () => {
+    const response = await getUsersList();
+    setListUsers(response.listUser);
+    console.log(response);
+  };
+  useEffect(() => {
+    userData();
+  }, []);
+
   // ** Store Vars
   const dispatch = useDispatch();
   const store = useSelector((state) => state.users);
@@ -216,21 +228,21 @@ const UsersList = () => {
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   // ** Get data on mount
-  useEffect(() => {
-    dispatch(getAllData());
-    dispatch(
-      getData({
-        sort,
-        sortColumn,
-        q: searchTerm,
-        page: currentPage,
-        perPage: rowsPerPage,
-        role: currentRole.value,
-        status: currentStatus.value,
-        currentPlan: currentPlan.value,
-      })
-    );
-  }, [dispatch, store.data.length, sort, sortColumn, currentPage]);
+  // useEffect(() => {
+  //   dispatch(getAllData());
+  //   dispatch(
+  //     getData({
+  //       sort,
+  //       sortColumn,
+  //       q: searchTerm,
+  //       page: currentPage,
+  //       perPage: rowsPerPage,
+  //       role: currentRole.value,
+  //       status: currentStatus.value,
+  //       currentPlan: currentPlan.value,
+  //     })
+  //   );
+  // }, [dispatch, store.data.length, sort, sortColumn, currentPage]);
 
   // ** User filter options
   const roleOptions = [
@@ -251,118 +263,115 @@ const UsersList = () => {
 
   // ** Function in get data on page change
   const handlePagination = (page) => {
-    dispatch(
-      getData({
-        sort,
-        sortColumn,
-        q: searchTerm,
-        perPage: rowsPerPage,
-        page: page.selected + 1,
-        role: currentRole.value,
-        status: currentStatus.value,
-        currentPlan: currentPlan.value,
-      })
-    );
-    setCurrentPage(page.selected + 1);
+    // dispatch(
+    //   getData({
+    //     sort,
+    //     sortColumn,
+    //     q: searchTerm,
+    //     perPage: rowsPerPage,
+    //     page: page.selected + 1,
+    //     role: currentRole.value,
+    //     status: currentStatus.value,
+    //     currentPlan: currentPlan.value,
+    //   })
+    // );
+    // setCurrentPage(page.selected + 1);
   };
 
   // ** Function in get data on rows per page
   const handlePerPage = (e) => {
-    const value = parseInt(e.currentTarget.value);
-    dispatch(
-      getData({
-        sort,
-        sortColumn,
-        q: searchTerm,
-        perPage: value,
-        page: currentPage,
-        role: currentRole.value,
-        currentPlan: currentPlan.value,
-        status: currentStatus.value,
-      })
-    );
-    setRowsPerPage(value);
+    // const value = parseInt(e.currentTarget.value);
+    // dispatch(
+    //   getData({
+    //     sort,
+    //     sortColumn,
+    //     q: searchTerm,
+    //     perPage: value,
+    //     page: currentPage,
+    //     role: currentRole.value,
+    //     currentPlan: currentPlan.value,
+    //     status: currentStatus.value,
+    //   })
+    // );
+    // setRowsPerPage(value);
   };
 
   // ** Function in get data on search query change
   const handleFilter = (val) => {
-    setSearchTerm(val);
-    dispatch(
-      getData({
-        sort,
-        q: val,
-        sortColumn,
-        page: currentPage,
-        perPage: rowsPerPage,
-        role: currentRole.value,
-        status: currentStatus.value,
-        currentPlan: currentPlan.value,
-      })
-    );
+    // setSearchTerm(val);
+    // dispatch(
+    //   getData({
+    //     sort,
+    //     q: val,
+    //     sortColumn,
+    //     page: currentPage,
+    //     perPage: rowsPerPage,
+    //     role: currentRole.value,
+    //     status: currentStatus.value,
+    //     currentPlan: currentPlan.value,
+    //   })
+    // );
   };
 
   // ** Custom Pagination
   const CustomPagination = () => {
-    const count = Number(Math.ceil(store.total / rowsPerPage));
-
-    return (
-      <ReactPaginate
-        previousLabel={""}
-        nextLabel={""}
-        pageCount={count || 1}
-        activeClassName="active"
-        forcePage={currentPage !== 0 ? currentPage - 1 : 0}
-        onPageChange={(page) => handlePagination(page)}
-        pageClassName={"page-item"}
-        nextLinkClassName={"page-link"}
-        nextClassName={"page-item next"}
-        previousClassName={"page-item prev"}
-        previousLinkClassName={"page-link"}
-        pageLinkClassName={"page-link"}
-        containerClassName={
-          "pagination react-paginate justify-content-end my-2 pe-1"
-        }
-      />
-    );
+    // const count = Number(Math.ceil(store.total / rowsPerPage));
+    // return (
+    //   <ReactPaginate
+    //     previousLabel={""}
+    //     nextLabel={""}
+    //     pageCount={count || 1}
+    //     activeClassName="active"
+    //     forcePage={currentPage !== 0 ? currentPage - 1 : 0}
+    //     onPageChange={(page) => handlePagination(page)}
+    //     pageClassName={"page-item"}
+    //     nextLinkClassName={"page-link"}
+    //     nextClassName={"page-item next"}
+    //     previousClassName={"page-item prev"}
+    //     previousLinkClassName={"page-link"}
+    //     pageLinkClassName={"page-link"}
+    //     containerClassName={
+    //       "pagination react-paginate justify-content-end my-2 pe-1"
+    //     }
+    //   />
+    // );
   };
 
   // ** Table data to render
   const dataToRender = () => {
-    const filters = {
-      role: currentRole.value,
-      currentPlan: currentPlan.value,
-      status: currentStatus.value,
-      q: searchTerm,
-    };
-
-    const isFiltered = Object.keys(filters).some(function (k) {
-      return filters[k].length > 0;
-    });
-
-    if (store.data.length > 0) {
-      return store.data;
-    } else if (store.data.length === 0 && isFiltered) {
-      return [];
-    } else {
-      return store.allData.slice(0, rowsPerPage);
-    }
+    // const filters = {
+    //   role: currentRole.value,
+    //   currentPlan: currentPlan.value,
+    //   status: currentStatus.value,
+    //   q: searchTerm,
+    // };
+    // const isFiltered = Object.keys(filters).some(function (k) {
+    //   return filters[k].length > 0;
+    // });
+    // if (store.data.length > 0) {
+    //   return store.data;
+    // } else if (store.data.length === 0 && isFiltered) {
+    //   return [];
+    // } else {
+    //   return store.allData.slice(0, rowsPerPage);
+    // }
   };
 
   const handleSort = (column, sortDirection) => {
-    setSort(sortDirection);
-    setSortColumn(column.sortField);
-    dispatch(
-      getData({
-        sort,
-        sortColumn,
-        q: searchTerm,
-        page: currentPage,
-        perPage: rowsPerPage,
-        role: currentRole.value,
-        status: currentStatus.value,
-        currentPlan: currentPlan.value,
-      })
-    );
+    // setSort(sortDirection);
+    // setSortColumn(column.sortField);
+    // dispatch(
+    //   getData({
+    //     sort,
+    //     sortColumn,
+    //     q: searchTerm,
+    //     page: currentPage,
+    //     perPage: rowsPerPage,
+    //     role: currentRole.value,
+    //     status: currentStatus.value,
+    //     currentPlan: currentPlan.value,
+    //   })
+    // );
   };
 
   return (
@@ -375,33 +384,33 @@ const UsersList = () => {
           <Row>
             <Col md="4">
               <Label for="role-select">نقش</Label>
-              <Select
+              {/* <Select
                 isClearable={false}
                 value={currentRole}
                 options={roleOptions}
                 className="react-select"
                 classNamePrefix="select"
-                theme={selectThemeColors}
-                onChange={(data) => {
-                  setCurrentRole(data);
-                  dispatch(
-                    getData({
-                      sort,
-                      sortColumn,
-                      q: searchTerm,
-                      role: data.value,
-                      page: currentPage,
-                      perPage: rowsPerPage,
-                      status: currentStatus.value,
-                      currentPlan: currentPlan.value,
-                    })
-                  );
-                }}
-              />
+                theme={selectThemeColors} 
+                // onChange={(data) => {
+                //   setCurrentRole(data);
+                //   dispatch(
+                //     getData({
+                //       sort,
+                //       sortColumn,
+                //       q: searchTerm,
+                //       role: data.value,
+                //       page: currentPage,
+                //       perPage: rowsPerPage,
+                //       status: currentStatus.value,
+                //       currentPlan: currentPlan.value,
+                //     })
+                //   );
+                // }}
+              /> */}
             </Col>
             <Col md="4">
               <Label for="status-select">وضعیت</Label>
-              <Select
+              {/* <Select 
                 theme={selectThemeColors}
                 isClearable={false}
                 className="react-select"
@@ -423,7 +432,7 @@ const UsersList = () => {
                     })
                   );
                 }}
-              />
+               /> */}
             </Col>
           </Row>
         </CardBody>
@@ -438,15 +447,16 @@ const UsersList = () => {
             pagination
             responsive
             paginationServer
+            data={listUsers}
             columns={columns}
-            onSort={handleSort}
+            // onSort={handleSort}
             sortIcon={<ChevronDown />}
             className="react-dataTable"
             paginationComponent={CustomPagination}
-            data={dataToRender()}
+            // data={dataToRender()}
             subHeaderComponent={
               <CustomHeader
-                store={store}
+                // store={store}
                 searchTerm={searchTerm}
                 rowsPerPage={rowsPerPage}
                 handleFilter={handleFilter}

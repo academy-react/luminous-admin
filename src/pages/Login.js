@@ -1,6 +1,7 @@
 // ** React Imports
+
 import { useSkin } from "@hooks/useSkin";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 // ** Icons Imports
 import { Facebook, Twitter, Mail, GitHub } from "react-feather";
@@ -27,10 +28,46 @@ import illustrationsDark from "@src/assets/images/pages/login-v2-dark.svg";
 // ** Styles
 import "@styles/react/pages/page-authentication.scss";
 
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { login } from "../core/services/api/get/auth/get-sign-in.api";
+import { getItem, setItem } from "../core/services/common/storage.services";
+
 const Login = () => {
   const { skin } = useSkin();
-
+  const navigate = useNavigate();
   const source = skin === "dark" ? illustrationsDark : illustrationsLight;
+  const phoneNumberSchema = z.string().regex(/^09\d{9}$/);
+  const gmailSchema = z.string().email();
+  const loginSchema = z.object({
+    phoneOrGmail: z.union([phoneNumberSchema, gmailSchema]),
+    password: z.string().min(1),
+    rememberMe: z
+      .union([z.boolean(), z.literal("true"), z.literal("false")])
+      .transform((value) => {
+        if (typeof value === "string") {
+          return value === "true";
+        }
+        return value;
+      }),
+  });
+
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+  } = useForm({ resolver: zodResolver(loginSchema) });
+
+  const handelLogin = async (data) => {
+    const loginUser = await login(data);
+    console.log("token", loginUser.token);
+    setItem("token", loginUser.token);
+    if (loginUser.token) {
+      navigate("/");
+    }
+    console.log(getItem("token"));
+  };
 
   return (
     <div className="auth-wrapper auth-cover">
@@ -121,45 +158,68 @@ const Login = () => {
             <CardText className="mb-2">
               Please sign-in to your account and start the adventure
             </CardText>
-            <Form
+            <form
               className="auth-login-form mt-2"
-              onSubmit={(e) => e.preventDefault()}
+              onSubmit={handleSubmit(handelLogin)}
             >
               <div className="mb-1">
-                <Label className="form-label" for="login-email">
+                <Label className="form-label" for="phoneOrGmail">
                   Email
                 </Label>
-                <Input
+                {/* <Input
                   type="email"
                   id="login-email"
                   placeholder="john@example.com"
+                  register = register
                   autoFocus
+                /> */}
+                <input
+                  type="text"
+                  id="phoneOrGmail"
+                  placeholder="john@example.com"
+                  {...register("phoneOrGmail")}
                 />
               </div>
               <div className="mb-1">
                 <div className="d-flex justify-content-between">
-                  <Label className="form-label" for="login-password">
+                  <Label className="form-label" for="password">
                     Password
                   </Label>
                   <Link to="/forgot-password">
                     <small>Forgot Password?</small>
                   </Link>
                 </div>
-                <InputPasswordToggle
+                {/* <InputPasswordToggle
                   className="input-group-merge"
-                  id="login-password"
+                  id="password"
+                  {...register("password")}
+                /> */}
+                <input
+                  type="password"
+                  id="password"
+                  placeholder=""
+                  {...register("password")}
                 />
               </div>
               <div className="form-check mb-1">
-                <Input type="checkbox" id="remember-me" />
-                <Label className="form-check-label" for="remember-me">
+                {/* <Input
+                  type="checkbox"
+                  id="rememberMe"
+                  {...register("rememberMe")}
+                /> */}
+                <input
+                  type="checkbox"
+                  id="rememberMe"
+                  {...register("rememberMe")}
+                />
+                <Label className="form-check-label" for="rememberMe">
                   Remember Me
                 </Label>
               </div>
-              <Button tag={Link} to="/" color="primary" block>
+              <Button color="primary" block>
                 Sign in
               </Button>
-            </Form>
+            </form>
             <p className="text-center mt-2">
               <span className="me-25">New on our platform?</span>
               <Link to="/register">

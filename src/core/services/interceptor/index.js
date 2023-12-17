@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getItem } from "../common/storage.services";
+import { getItem, removeItem } from "../common/storage.services";
 
 // const baseURL = import.meta.env.VITE_BASE_URL;
 
@@ -12,10 +12,13 @@ const onSuccess = (response) => {
 };
 
 const onError = (err) => {
-  console.log(err);
-  console.log(err.response.data);
-  if (err.response.status >= 400 && err.response.status < 500) {
-    alert("Client error: " + err.response.status);
+  if (err.response.status === 401) {
+    removeItem("token");
+    window.location.pathname = "/login";
+  }
+  if (err.response.status === 403) {
+    removeItem("token");
+    window.alert("دسترسی ندارید");
   }
 
   return Promise.reject(err);
@@ -24,6 +27,9 @@ const onError = (err) => {
 instance.interceptors.response.use(onSuccess, onError);
 
 instance.interceptors.request.use((opt) => {
+  const token = getItem("token");
+  if (token) opt.headers.Authorization = "bearer " + token;
+
   return opt;
 });
 
